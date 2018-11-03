@@ -1,0 +1,43 @@
+---
+- name: Install CloudWatch agent
+  hosts: mastercentos7
+  tasks:
+    - name: Download the installer
+      get_url: url=https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py dest=/tmp/awslogs-agent-setup.py group=root owner=root mode=0770
+        
+ 
+    - name: Create Directory for Downloading Cloudwatch Agent .zip
+      file:
+        path: /opt/aws/amazon-cloudwatch-zip/
+        state: directory
+        owner: root
+        group: root
+        mode: 0770
+        recurse: no
+ 
+    - name: Install unzip
+      yum: pkg=unzip state=present
+
+
+    - name: Download Latest Version of Amazon Cloudwatch Agent
+      get_url:
+        url: "https://s3.amazonaws.com/amazoncloudwatch-agent/linux/amd64/latest/AmazonCloudWatchAgent.zip"
+        dest: /opt/aws/amazon-cloudwatch-zip/AmazonCloudWatchAgent.zip
+        mode: 0770
+      
+ 
+    - name: Unzip Cloudwatch Download File
+      unarchive:
+        remote_src: yes
+        src: /opt/aws/amazon-cloudwatch-zip/AmazonCloudWatchAgent.zip
+        dest: /opt/aws/amazon-cloudwatch-zip/
+      ignore_errors: yes
+
+
+      
+ 
+    - name: Execute the Installation Script
+      command: /opt/aws/amazon-cloudwatch-zip/install.sh
+      args:
+        chdir: /opt/aws/amazon-cloudwatch-zip
+ 
